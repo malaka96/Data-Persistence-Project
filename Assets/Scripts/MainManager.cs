@@ -11,6 +11,7 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text BestScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -24,6 +25,8 @@ public class MainManager : MonoBehaviour
     {
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
+
+        BestScoreText.text = $"Best Score : {PlayerPrefs.GetString("_userName", "User")} : {PlayerPrefs.GetInt("_playerScore", 0)}";
         
         int[] pointCountArray = new [] {1,1,2,2,5,5};
         for (int i = 0; i < LineCount; ++i)
@@ -44,22 +47,28 @@ public class MainManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                m_Started = true;
-                float randomDirection = Random.Range(-1.0f, 1.0f);
-                Vector3 forceDir = new Vector3(randomDirection, 1, 0);
-                forceDir.Normalize();
+                  m_Started = true;
+                  float randomDirection = Random.Range(-1.0f, 1.0f);
+                  Vector3 forceDir = new Vector3(randomDirection, 1, 0);
+                  forceDir.Normalize();
 
-                Ball.transform.SetParent(null);
-                Ball.AddForce(forceDir * 2.0f, ForceMode.VelocityChange);
+                  Ball.transform.SetParent(null);
+                  Ball.AddForce(forceDir * 2.0f, ForceMode.VelocityChange); 
+
+
+
             }
         }
         else if (m_GameOver)
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                SceneManager.LoadScene(0);
+
             }
         }
+
+        BestScoreText.text = $"Best Score : {PlayerPrefs.GetString("_userName", "User")} : {PlayerPrefs.GetInt("_playerScore", 0)}";
     }
 
     void AddPoint(int point)
@@ -70,6 +79,13 @@ public class MainManager : MonoBehaviour
 
     public void GameOver()
     {
+        if (PlayerPrefs.GetInt("_playerScore") < m_Points)
+        {
+            PlayerPrefs.SetInt("_playerScore", m_Points);
+            PlayerPrefs.SetString("_userName", MainMenuScript._playerName);
+
+        }
+
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
